@@ -126,17 +126,6 @@ const Splash = () => {
           onLoad={onImageLoad}
         />
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-          {/* Egg behind the chicken */}
-          <img
-            src={eggImg}
-            alt=""
-            className="w-10 md:w-14 absolute -bottom-1 left-1/2 -translate-x-1/2 translate-x-6 opacity-60 hover:opacity-100 hover:scale-110 transition-all cursor-pointer z-0"
-            width={512}
-            height={512}
-            onClick={handleEggClick}
-            loading="lazy"
-          />
-          {/* Chicken in front */}
           <img
             src={chickenImg}
             alt="A cute hand-drawn chicken"
@@ -147,6 +136,17 @@ const Splash = () => {
           />
         </div>
       </div>
+
+      {/* Egg at bottom left */}
+      <img
+        src={eggImg}
+        alt=""
+        className="fixed bottom-6 left-6 w-10 md:w-14 opacity-40 hover:opacity-100 hover:scale-110 transition-all cursor-pointer z-20"
+        width={512}
+        height={512}
+        onClick={handleEggClick}
+        loading="lazy"
+      />
 
       {/* Login popup */}
       {showLogin && (

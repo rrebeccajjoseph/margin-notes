@@ -47,7 +47,6 @@ const tabLabels: Record<Tab, string> = {
 };
 
 const tabDescriptions: Partial<Record<Tab, string>> = {
-  essay: 'long-form thoughts, reflections, and musings',
   appreciation: 'quotes, books, articles, and other people\'s work that we love',
 };
 

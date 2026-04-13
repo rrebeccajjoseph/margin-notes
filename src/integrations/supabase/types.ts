@@ -21,6 +21,7 @@ export type Database = {
           description: string | null
           id: string
           link: string | null
+          tagged_author: string | null
           title: string
           user_id: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           description?: string | null
           id?: string
           link?: string | null
+          tagged_author?: string | null
           title: string
           user_id: string
         }
@@ -39,6 +41,7 @@ export type Database = {
           description?: string | null
           id?: string
           link?: string | null
+          tagged_author?: string | null
           title?: string
           user_id?: string
         }
@@ -52,6 +55,7 @@ export type Database = {
           link: string | null
           notes: string | null
           rating: number | null
+          tagged_author: string | null
           title: string
           user_id: string
         }
@@ -62,6 +66,7 @@ export type Database = {
           link?: string | null
           notes?: string | null
           rating?: number | null
+          tagged_author?: string | null
           title: string
           user_id: string
         }
@@ -72,6 +77,7 @@ export type Database = {
           link?: string | null
           notes?: string | null
           rating?: number | null
+          tagged_author?: string | null
           title?: string
           user_id?: string
         }
@@ -180,6 +186,7 @@ export type Database = {
           id: string
           link: string | null
           source: string | null
+          tagged_author: string | null
           text: string
           user_id: string
         }
@@ -190,6 +197,7 @@ export type Database = {
           id?: string
           link?: string | null
           source?: string | null
+          tagged_author?: string | null
           text: string
           user_id: string
         }
@@ -200,6 +208,7 @@ export type Database = {
           id?: string
           link?: string | null
           source?: string | null
+          tagged_author?: string | null
           text?: string
           user_id?: string
         }

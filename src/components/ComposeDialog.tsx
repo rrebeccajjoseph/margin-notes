@@ -43,6 +43,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
   const [text, setText] = useState('');
   const [author, setAuthor] = useState('');
   const [selectedAuthor, setSelectedAuthor] = useState(() => getDefaultAuthor(user?.email ?? null));
+  const [taggedAuthor, setTaggedAuthor] = useState(() => getDefaultAuthor(user?.email ?? null));
   const [source, setSource] = useState('');
   const [description, setDescription] = useState('');
   const [link, setLink] = useState('');
@@ -56,6 +57,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
     setText('');
     setAuthor('');
     setSelectedAuthor(getDefaultAuthor(user?.email ?? null));
+    setTaggedAuthor(getDefaultAuthor(user?.email ?? null));
     setSource('');
     setDescription('');
     setLink('');
@@ -84,6 +86,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
           source: source || null,
           description: description || null,
           link: link || null,
+          tagged_author: taggedAuthor || null,
           user_id: user.id,
         });
         if (error) throw error;
@@ -93,6 +96,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
           author: author || selectedAuthor,
           rating: rating || null,
           link: link || null,
+          tagged_author: taggedAuthor || null,
           user_id: user.id,
         });
         if (error) throw error;
@@ -102,6 +106,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
           author: author || null,
           link: link || null,
           description: description || null,
+          tagged_author: taggedAuthor || null,
           user_id: user.id,
         });
         if (error) throw error;
@@ -208,6 +213,16 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
                 className="border-border bg-transparent"
                 style={{ fontFamily: 'var(--font-mono)' }}
               />
+              <Select value={taggedAuthor} onValueChange={setTaggedAuthor}>
+                <SelectTrigger className="border-border" style={{ fontFamily: 'var(--font-body)' }}>
+                  <SelectValue placeholder="tagged by…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {authorOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </>
           )}
 
@@ -250,6 +265,16 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
                 className="border-border bg-transparent"
                 style={{ fontFamily: 'var(--font-mono)' }}
               />
+              <Select value={taggedAuthor} onValueChange={setTaggedAuthor}>
+                <SelectTrigger className="border-border" style={{ fontFamily: 'var(--font-body)' }}>
+                  <SelectValue placeholder="tagged by…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {authorOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </>
           )}
 
@@ -284,6 +309,16 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
                 className="border-border bg-transparent"
                 style={{ fontFamily: 'var(--font-mono)' }}
               />
+              <Select value={taggedAuthor} onValueChange={setTaggedAuthor}>
+                <SelectTrigger className="border-border" style={{ fontFamily: 'var(--font-body)' }}>
+                  <SelectValue placeholder="tagged by…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {authorOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </>
           )}
 

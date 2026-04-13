@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 import ComposeDialog from '@/components/ComposeDialog';
+import EditDialog from '@/components/EditDialog';
 import chickenImg from '@/assets/chicken.png';
 import eggImg from '@/assets/egg.png';
 
@@ -34,6 +35,7 @@ interface Quote {
   source: string | null;
   description: string | null;
   link: string | null;
+  tagged_author: string | null;
   created_at: string;
   user_id: string;
 }
@@ -45,6 +47,7 @@ interface Book {
   notes: string | null;
   rating: number | null;
   link: string | null;
+  tagged_author: string | null;
   created_at: string;
   user_id: string;
 }
@@ -55,6 +58,7 @@ interface Article {
   author: string | null;
   link: string | null;
   description: string | null;
+  tagged_author: string | null;
   created_at: string;
   user_id: string;
 }
@@ -99,6 +103,7 @@ const Index = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [editingItem, setEditingItem] = useState<{ type: 'post' | 'quote' | 'book' | 'article'; data: any } | null>(null);
 
   const handleEggClick = () => {
     if (user) {
@@ -159,10 +164,19 @@ const Index = () => {
     }
   };
 
-  const OwnerActions = ({ table, id, userId }: { table: string; id: string; userId: string }) => {
+  const OwnerActions = ({ table, id, userId, onEdit }: { table: string; id: string; userId: string; onEdit?: () => void }) => {
     if (!user) return null;
     return (
       <div className="flex gap-1.5 mt-2">
+        {onEdit && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            className="text-muted-foreground/50 hover:text-foreground transition-colors p-0.5"
+            title="edit"
+          >
+            <Pencil size={12} />
+          </button>
+        )}
         <button
           onClick={(e) => { e.stopPropagation(); handleDelete(table, id); }}
           className="text-muted-foreground/50 hover:text-destructive transition-colors p-0.5"
@@ -302,7 +316,12 @@ const Index = () => {
                             {q.description}
                           </p>
                         )}
-                        <OwnerActions table="quotes" id={q.id} userId={q.user_id} />
+                        {q.tagged_author && (
+                          <p className="text-[10px] mt-2 italic" style={{ fontFamily: 'var(--font-body)', color: getAuthorColor(q.tagged_author) || 'hsl(var(--muted-foreground))' }}>
+                            ✿ {q.tagged_author}
+                          </p>
+                        )}
+                        <OwnerActions table="quotes" id={q.id} userId={q.user_id} onEdit={() => setEditingItem({ type: 'quote', data: q })} />
                       </CardContent>
                     </Card>
                   ))}
@@ -345,7 +364,12 @@ const Index = () => {
                             ))}
                           </p>
                         )}
-                        <OwnerActions table="books" id={b.id} userId={b.user_id} />
+                        {b.tagged_author && (
+                          <p className="text-[10px] mt-1 italic" style={{ fontFamily: 'var(--font-body)', color: getAuthorColor(b.tagged_author) || 'hsl(var(--muted-foreground))' }}>
+                            ✿ {b.tagged_author}
+                          </p>
+                        )}
+                        <OwnerActions table="books" id={b.id} userId={b.user_id} onEdit={() => setEditingItem({ type: 'book', data: b })} />
                       </CardContent>
                     </Card>
                   ))}
@@ -382,14 +406,17 @@ const Index = () => {
                           </p>
                         )}
                       </CardHeader>
-                      {a.description && (
-                        <CardContent className="px-4 pb-4">
-                          <p className="text-xs leading-relaxed text-muted-foreground">{a.description}</p>
-                        </CardContent>
-                      )}
-                      <div className="px-4 pb-3">
-                        <OwnerActions table="articles" id={a.id} userId={a.user_id} />
-                      </div>
+                      <CardContent className="px-4 pb-4">
+                        {a.description && (
+                          <p className="text-xs leading-relaxed text-muted-foreground mb-1">{a.description}</p>
+                        )}
+                        {a.tagged_author && (
+                          <p className="text-[10px] mt-1 italic" style={{ fontFamily: 'var(--font-body)', color: getAuthorColor(a.tagged_author) || 'hsl(var(--muted-foreground))' }}>
+                            ✿ {a.tagged_author}
+                          </p>
+                        )}
+                        <OwnerActions table="articles" id={a.id} userId={a.user_id} onEdit={() => setEditingItem({ type: 'article', data: a })} />
+                      </CardContent>
                     </Card>
                   ))}
                 </div>
@@ -447,6 +474,13 @@ const Index = () => {
                     {user && (
                       <div className="absolute bottom-2 right-2 flex gap-1">
                         <button
+                          onClick={(e) => { e.stopPropagation(); setEditingItem({ type: 'post', data: p }); }}
+                          className="text-muted-foreground/40 hover:text-foreground transition-colors p-1"
+                          title="edit"
+                        >
+                          <Pencil size={12} />
+                        </button>
+                        <button
                           onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}
                           className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
                           title="delete"
@@ -488,6 +522,18 @@ const Index = () => {
 
       {/* Compose button (logged in only) */}
       <ComposeDialog onCreated={fetchData} />
+
+      {/* Edit dialog */}
+      {editingItem && (
+        <EditDialog
+          key={editingItem.data.id}
+          type={editingItem.type}
+          item={editingItem.data}
+          open={true}
+          onOpenChange={(open) => { if (!open) setEditingItem(null); }}
+          onUpdated={fetchData}
+        />
+      )}
 
       {/* Footer */}
       <footer className="border-t border-border py-6 text-center">

@@ -90,7 +90,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
       } else if (contentType === 'book') {
         const { error } = await supabase.from('books').insert({
           title,
-          author: author || authorName,
+          author: author || selectedAuthor,
           rating: rating || null,
           link: link || null,
           user_id: user.id,

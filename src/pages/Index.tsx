@@ -83,46 +83,21 @@ const getAuthorColor = (author: string | null) => {
 
 const ITEMS_PER_PAGE = 4;
 
+const flowerStyle = "fixed pointer-events-none select-none";
+
 const WatercolorFlowers = () => (
   <>
-    {/* Top-left cluster */}
-    <div className="fixed top-16 left-4 opacity-20 pointer-events-none select-none text-3xl" style={{ filter: 'blur(0.5px)' }}>
-      🌸
-    </div>
-    <div className="fixed top-28 left-8 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.3px)' }}>
-      🌷
-    </div>
-    <div className="fixed top-10 left-20 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.7px)' }}>
-      🌺
-    </div>
-    {/* Top-right cluster */}
-    <div className="fixed top-20 right-6 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.5px)' }}>
-      🌸
-    </div>
-    <div className="fixed top-8 right-24 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.6px)' }}>
-      🌼
-    </div>
-    {/* Bottom-left */}
-    <div className="fixed bottom-20 left-6 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.4px)' }}>
-      🌷
-    </div>
-    <div className="fixed bottom-8 left-16 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.7px)' }}>
-      🌸
-    </div>
-    {/* Bottom-right */}
-    <div className="fixed bottom-16 right-8 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.5px)' }}>
-      🌺
-    </div>
-    <div className="fixed bottom-32 right-20 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.6px)' }}>
-      🌸
-    </div>
-    {/* Mid sides */}
-    <div className="fixed top-1/2 left-2 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.5px)' }}>
-      🌼
-    </div>
-    <div className="fixed top-1/2 right-3 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.5px)' }}>
-      🌷
-    </div>
+    <img src={flower1} alt="" className={`${flowerStyle} top-12 left-2 w-16 opacity-25`} loading="lazy" />
+    <img src={flower2} alt="" className={`${flowerStyle} top-28 left-12 w-10 opacity-20`} style={{ transform: 'rotate(30deg)' }} loading="lazy" />
+    <img src={flower3} alt="" className={`${flowerStyle} top-6 left-24 w-12 opacity-15`} style={{ transform: 'rotate(-20deg)' }} loading="lazy" />
+    <img src={flower1} alt="" className={`${flowerStyle} top-16 right-4 w-14 opacity-20`} style={{ transform: 'rotate(45deg)' }} loading="lazy" />
+    <img src={flower4} alt="" className={`${flowerStyle} top-4 right-28 w-10 opacity-15`} style={{ transform: 'rotate(-15deg)' }} loading="lazy" />
+    <img src={flower2} alt="" className={`${flowerStyle} bottom-16 left-4 w-14 opacity-20`} style={{ transform: 'rotate(60deg)' }} loading="lazy" />
+    <img src={flower3} alt="" className={`${flowerStyle} bottom-6 left-20 w-10 opacity-15`} style={{ transform: 'rotate(-40deg)' }} loading="lazy" />
+    <img src={flower4} alt="" className={`${flowerStyle} bottom-12 right-6 w-14 opacity-20`} style={{ transform: 'rotate(25deg)' }} loading="lazy" />
+    <img src={flower1} alt="" className={`${flowerStyle} bottom-28 right-24 w-10 opacity-15`} style={{ transform: 'rotate(-30deg)' }} loading="lazy" />
+    <img src={flower3} alt="" className={`${flowerStyle} top-1/2 left-1 w-10 opacity-15`} style={{ transform: 'rotate(50deg)' }} loading="lazy" />
+    <img src={flower2} alt="" className={`${flowerStyle} top-1/2 right-2 w-10 opacity-15`} style={{ transform: 'rotate(-50deg)' }} loading="lazy" />
   </>
 );
 

@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import { format } from 'date-fns';
 
 type Category = 'essay' | 'poetry';
-type Tab = Category | 'quotes' | 'books' | 'appreciation';
+type Tab = Category | 'appreciation';
 
 interface Post {
   id: string;
@@ -42,8 +42,6 @@ interface Book {
 const tabLabels: Record<Tab, string> = {
   essay: 'Essays',
   poetry: 'Poetry',
-  books: 'Books',
-  quotes: 'Quotes',
   appreciation: 'Appreciation',
 };
 

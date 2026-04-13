@@ -160,7 +160,6 @@ const Index = () => {
                 rebecca and isha's margin notes
               </h1>
             </div>
-            </div>
             <p className="text-muted-foreground italic mt-1 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
               essays · poetry · appreciation
             </p>

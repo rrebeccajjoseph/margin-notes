@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Search, ArrowUpRight } from 'lucide-react';
+import { Search, ArrowUpRight, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+import UserIndicator from '@/components/UserIndicator';
+import ComposeDialog from '@/components/ComposeDialog';
 
 type Category = 'essay' | 'poetry';
 type Tab = Category | 'appreciation';
@@ -73,6 +77,7 @@ const getAuthorColor = (author: string | null) => {
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const initialTab = (location.state as any)?.tab || 'essay';
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -102,24 +107,55 @@ const Index = () => {
     }
   };
 
+  const isOwner = (itemUserId: string) => user?.id === itemUserId;
+
+  const handleDelete = async (table: string, id: string) => {
+    if (!confirm('are you sure?')) return;
+    const { error } = await supabase.from(table).delete().eq('id', id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('deleted');
+      fetchData();
+    }
+  };
+
+  const OwnerActions = ({ table, id, userId }: { table: string; id: string; userId: string }) => {
+    if (!isOwner(userId)) return null;
+    return (
+      <div className="flex gap-1.5 mt-2">
+        <button
+          onClick={(e) => { e.stopPropagation(); handleDelete(table, id); }}
+          className="text-muted-foreground/50 hover:text-destructive transition-colors p-0.5"
+          title="delete"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border py-8 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-light tracking-wider md:text-3xl" style={{ fontFamily: 'var(--font-mono)' }}>
-            rebecca and isha's margin notes
-          </h1>
-          <p className="text-muted-foreground italic mt-1 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
-            essays · poetry · appreciation
-          </p>
-          <button
-            onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            ← back to chicken
-          </button>
+        <div className="max-w-5xl mx-auto flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-light tracking-wider md:text-3xl" style={{ fontFamily: 'var(--font-mono)' }}>
+              rebecca and isha's margin notes
+            </h1>
+            <p className="text-muted-foreground italic mt-1 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+              essays · poetry · appreciation
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              ← back to chicken
+            </button>
+          </div>
+          <UserIndicator />
         </div>
       </header>
 
@@ -187,7 +223,6 @@ const Index = () => {
 
       {/* Content */}
       <main className="max-w-5xl mx-auto px-6 py-6">
-        {/* Grid Content */}
         {activeTab === 'appreciation' ? (
           <div className="space-y-8">
             {quotes.filter((q) => {
@@ -224,6 +259,7 @@ const Index = () => {
                             {q.description}
                           </p>
                         )}
+                        <OwnerActions table="quotes" id={q.id} userId={q.user_id} />
                       </CardContent>
                     </Card>
                   ))}
@@ -266,13 +302,13 @@ const Index = () => {
                             ))}
                           </p>
                         )}
+                        <OwnerActions table="books" id={b.id} userId={b.user_id} />
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               </div>
             )}
-            {/* Articles section */}
             {articles.filter((a) => {
               if (!searchQuery) return true;
               const s = searchQuery.toLowerCase();
@@ -308,6 +344,9 @@ const Index = () => {
                           <p className="text-xs leading-relaxed text-muted-foreground">{a.description}</p>
                         </CardContent>
                       )}
+                      <div className="px-4 pb-3">
+                        <OwnerActions table="articles" id={a.id} userId={a.user_id} />
+                      </div>
                     </Card>
                   ))}
                 </div>
@@ -331,7 +370,7 @@ const Index = () => {
               .map((p) => (
               <Card
                 key={p.id}
-                className="bg-card border-border cursor-pointer hover:shadow-md transition-all rounded-2xl aspect-square flex flex-col"
+                className="bg-card border-border cursor-pointer hover:shadow-md transition-all rounded-2xl aspect-square flex flex-col relative"
                 onClick={() => navigate(`/post/${p.id}`)}
               >
                 <CardHeader className="pb-1 flex-1 flex flex-col justify-center items-center text-center px-4">
@@ -345,6 +384,17 @@ const Index = () => {
                     {p.author}
                   </p>
                 </CardHeader>
+                {isOwner(p.user_id) && (
+                  <div className="absolute bottom-2 right-2 flex gap-1">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}
+                      className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
+                      title="delete"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                )}
               </Card>
             ))}
           </div>
@@ -360,6 +410,9 @@ const Index = () => {
           </div>
         )}
       </main>
+
+      {/* Compose button (logged in only) */}
+      <ComposeDialog onCreated={fetchData} />
 
       {/* Footer */}
       <footer className="border-t border-border py-6 text-center">

@@ -197,15 +197,6 @@ const Index = () => {
               ← back to chicken
             </button>
           </div>
-          <img
-            src={eggImg}
-            alt="egg"
-            className="w-10 md:w-14 cursor-pointer opacity-40 hover:opacity-100 hover:scale-110 transition-all"
-            onClick={handleEggClick}
-            title={user ? 'sign out' : 'sign in'}
-            width={512}
-            height={512}
-          />
         </div>
       </header>
 
@@ -504,6 +495,18 @@ const Index = () => {
           ❦ made with tenderness ❦
         </p>
       </footer>
+
+      {/* Egg at bottom left */}
+      <img
+        src={eggImg}
+        alt="egg"
+        className="fixed bottom-6 left-6 w-10 md:w-14 opacity-40 hover:opacity-100 hover:scale-110 transition-all cursor-pointer z-20"
+        onClick={handleEggClick}
+        title={user ? 'sign out' : 'sign in'}
+        width={512}
+        height={512}
+        loading="lazy"
+      />
 
       {/* Login popup */}
       {showLogin && (

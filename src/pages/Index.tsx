@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { format } from 'date-fns';
 
-type Category = 'essay' | 'poetry' | 'misc';
-type Tab = Category | 'quotes' | 'books';
+type Category = 'essay' | 'poetry';
+type Tab = Category | 'quotes' | 'books' | 'appreciation';
 
 interface Post {
   id: string;
@@ -44,7 +44,11 @@ const tabLabels: Record<Tab, string> = {
   poetry: 'Poetry',
   books: 'Books',
   quotes: 'Quotes',
-  misc: 'Miscellany',
+  appreciation: 'Appreciation',
+};
+
+const tabDescriptions: Partial<Record<Tab, string>> = {
+  appreciation: 'quotes, books, articles, and other people\'s work that we love',
 };
 
 const Index = () => {
@@ -63,7 +67,14 @@ const Index = () => {
   }, [activeTab]);
 
   const fetchData = async () => {
-    if (activeTab === 'quotes') {
+    if (activeTab === 'appreciation') {
+      const [quotesRes, booksRes] = await Promise.all([
+        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
+        supabase.from('books').select('*').order('created_at', { ascending: false }),
+      ]);
+      if (quotesRes.data) setQuotes(quotesRes.data);
+      if (booksRes.data) setBooks(booksRes.data);
+    } else if (activeTab === 'quotes') {
       const { data } = await supabase.from('quotes').select('*').order('created_at', { ascending: false });
       if (data) setQuotes(data);
     } else if (activeTab === 'books') {
@@ -84,7 +95,7 @@ const Index = () => {
             rebecca and isha's margin notes
           </h1>
           <p className="text-muted-foreground italic mt-1 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
-            essays · poetry · books · quotes · miscellany
+            essays · poetry · appreciation
           </p>
           <button
             onClick={() => navigate('/')}
@@ -114,6 +125,13 @@ const Index = () => {
             </button>
           ))}
         </div>
+        {tabDescriptions[activeTab] && (
+          <div className="max-w-5xl mx-auto px-5 pt-2 pb-1">
+            <p className="text-xs text-muted-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
+              {tabDescriptions[activeTab]}
+            </p>
+          </div>
+        )}
       </nav>
 
       {/* Search */}
@@ -154,61 +172,82 @@ const Index = () => {
       {/* Content */}
       <main className="max-w-5xl mx-auto px-6 py-6">
         {/* Grid Content */}
-        {activeTab === 'quotes' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {quotes
-              .filter((q) => {
-                if (!searchQuery) return true;
-                const s = searchQuery.toLowerCase();
-                return q.text.toLowerCase().includes(s) || (q.author?.toLowerCase().includes(s));
-              })
-              .map((q) => (
-              <Card key={q.id} className="bg-card border-border rounded-2xl">
-                <CardContent className="pt-5 pb-4 px-5">
-                  <blockquote className="text-sm italic leading-relaxed mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
-                    "{q.text}"
-                  </blockquote>
-                  {q.author && (
-                    <p className="text-xs text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
-                      — {q.author}{q.source ? `, ${q.source}` : ''}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : activeTab === 'books' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {books
-              .filter((b) => {
-                if (!searchQuery) return true;
-                const s = searchQuery.toLowerCase();
-                return b.title.toLowerCase().includes(s) || b.author.toLowerCase().includes(s);
-              })
-              .map((b) => (
-              <Card key={b.id} className="bg-card border-border rounded-2xl">
-                <CardHeader className="pb-1 pt-4 px-4">
-                  <CardTitle className="text-base font-normal leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>
-                    {b.title}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
-                    by {b.author}
-                  </p>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  {b.rating && (
-                    <p className="text-muted-foreground mb-1 text-xs">
-                      {Array.from({ length: b.rating }).map((_, i) => (
-                        <span key={i}>✿</span>
-                      ))}
-                    </p>
-                  )}
-                  {b.notes && (
-                    <p className="text-xs leading-relaxed prose-vintage line-clamp-3">{b.notes}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+        {activeTab === 'appreciation' ? (
+          <div className="space-y-8">
+            {quotes.filter((q) => {
+              if (!searchQuery) return true;
+              const s = searchQuery.toLowerCase();
+              return q.text.toLowerCase().includes(s) || (q.author?.toLowerCase().includes(s));
+            }).length > 0 && (
+              <div>
+                <h2 className="text-sm tracking-wider text-muted-foreground mb-3" style={{ fontFamily: 'var(--font-mono)' }}>quotes</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {quotes.filter((q) => {
+                    if (!searchQuery) return true;
+                    const s = searchQuery.toLowerCase();
+                    return q.text.toLowerCase().includes(s) || (q.author?.toLowerCase().includes(s));
+                  }).map((q) => (
+                    <Card key={q.id} className="bg-card border-border rounded-2xl">
+                      <CardContent className="pt-5 pb-4 px-5">
+                        <blockquote className="text-sm italic leading-relaxed mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
+                          "{q.text}"
+                        </blockquote>
+                        {q.author && (
+                          <p className="text-xs text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
+                            — {q.author}{q.source ? `, ${q.source}` : ''}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            {books.filter((b) => {
+              if (!searchQuery) return true;
+              const s = searchQuery.toLowerCase();
+              return b.title.toLowerCase().includes(s) || b.author.toLowerCase().includes(s);
+            }).length > 0 && (
+              <div>
+                <h2 className="text-sm tracking-wider text-muted-foreground mb-3" style={{ fontFamily: 'var(--font-mono)' }}>books</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {books.filter((b) => {
+                    if (!searchQuery) return true;
+                    const s = searchQuery.toLowerCase();
+                    return b.title.toLowerCase().includes(s) || b.author.toLowerCase().includes(s);
+                  }).map((b) => (
+                    <Card key={b.id} className="bg-card border-border rounded-2xl">
+                      <CardHeader className="pb-1 pt-4 px-4">
+                        <CardTitle className="text-base font-normal leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>
+                          {b.title}
+                        </CardTitle>
+                        <p className="text-xs text-muted-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
+                          by {b.author}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="px-4 pb-4">
+                        {b.rating && (
+                          <p className="text-muted-foreground mb-1 text-xs">
+                            {Array.from({ length: b.rating }).map((_, i) => (
+                              <span key={i}>✿</span>
+                            ))}
+                          </p>
+                        )}
+                        {b.notes && (
+                          <p className="text-xs leading-relaxed prose-vintage line-clamp-3">{b.notes}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            {quotes.length === 0 && books.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground italic text-lg" style={{ fontFamily: 'var(--font-serif)' }}>nothing here yet…</p>
+                <div className="ornament" />
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -241,9 +280,7 @@ const Index = () => {
         )}
 
         {/* Empty state */}
-        {((activeTab === 'quotes' && quotes.length === 0) ||
-          (activeTab === 'books' && books.length === 0) ||
-          (!['quotes', 'books'].includes(activeTab) && posts.length === 0)) && (
+        {activeTab !== 'appreciation' && posts.length === 0 && (
           <div className="text-center py-20">
             <p className="text-muted-foreground italic text-lg" style={{ fontFamily: 'var(--font-serif)' }}>
               nothing here yet…

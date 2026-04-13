@@ -138,57 +138,62 @@ const PostDetail = () => {
         />
 
         {/* Comments section */}
-        <div className="mt-16 pt-8 border-t border-border">
-          <h2 className="text-sm tracking-wider text-muted-foreground mb-6" style={{ fontFamily: 'var(--font-mono)' }}>
-            margin notes ✿
+        <div className="mt-16 pt-8 border-t border-border/50">
+          <h2 className="text-xs tracking-widest uppercase text-muted-foreground/60 mb-6" style={{ fontFamily: 'var(--font-mono)' }}>
+            margin notes
           </h2>
 
           {/* Comment list */}
           {comments.length > 0 && (
-            <div className="space-y-4 mb-8">
+            <div className="space-y-5 mb-10">
               {comments.map((c) => (
-                <div key={c.id} className="border-l-2 border-border pl-4 py-1">
-                  <p className="text-sm leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
+                <div key={c.id} className="group">
+                  <p className="text-sm leading-relaxed text-foreground/80" style={{ fontFamily: 'var(--font-body)' }}>
                     {c.content}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs italic text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
-                      — {c.display_name}
-                    </span>
-                    <span className="text-xs text-muted-foreground/50" style={{ fontFamily: 'var(--font-mono)' }}>
-                      {format(new Date(c.created_at), 'MMM d, yyyy')}
-                    </span>
-                  </div>
+                  <p className="text-[10px] text-muted-foreground/50 mt-1" style={{ fontFamily: 'var(--font-mono)' }}>
+                    {c.display_name} · {format(new Date(c.created_at), 'MMM d')}
+                  </p>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Comment form */}
-          <form onSubmit={handleSubmitComment} className="space-y-3">
-            <Input
-              placeholder="your name (or leave blank for anonymous)"
-              value={commentName}
-              onChange={(e) => setCommentName(e.target.value)}
-              className="bg-background border-border text-sm"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            />
-            <Textarea
-              placeholder="leave a note…"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              required
-              className="bg-background border-border text-sm min-h-[80px] resize-none"
-              style={{ fontFamily: 'var(--font-body)' }}
-            />
-            <Button
-              type="submit"
-              disabled={submitting || !commentText.trim()}
-              className="text-sm"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}
-            >
-              {submitting ? 'sending…' : 'leave a note'}
-            </Button>
+          {/* Comment form — minimal inline style */}
+          <form onSubmit={handleSubmitComment} className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                placeholder="name (optional)"
+                value={commentName}
+                onChange={(e) => setCommentName(e.target.value)}
+                className="bg-transparent border-b border-border/50 focus:border-foreground/30 outline-none text-xs py-1.5 w-32 text-foreground placeholder:text-muted-foreground/40 transition-colors"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              />
+            </div>
+            <div className="flex gap-2 items-end">
+              <textarea
+                placeholder="leave a note…"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                required
+                rows={1}
+                className="bg-transparent border-b border-border/50 focus:border-foreground/30 outline-none text-sm py-1.5 flex-1 text-foreground placeholder:text-muted-foreground/40 resize-none transition-colors"
+                style={{ fontFamily: 'var(--font-body)' }}
+                onInput={(e) => {
+                  const el = e.target as HTMLTextAreaElement;
+                  el.style.height = 'auto';
+                  el.style.height = el.scrollHeight + 'px';
+                }}
+              />
+              <button
+                type="submit"
+                disabled={submitting || !commentText.trim()}
+                className="text-[10px] tracking-wider text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors pb-1.5 shrink-0"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                {submitting ? '…' : '→'}
+              </button>
+            </div>
           </form>
         </div>
       </main>

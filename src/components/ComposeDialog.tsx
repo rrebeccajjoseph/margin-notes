@@ -65,7 +65,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const authorName = getAuthorName(user.email ?? null);
+      
 
       if (contentType === 'essay' || contentType === 'poetry') {
         const { error } = await supabase.from('posts').insert({

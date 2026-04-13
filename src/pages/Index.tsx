@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Search, ArrowUpRight, Pencil, Trash2 } from 'lucide-react';
+import { Search, ArrowUpRight, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import UserIndicator from '@/components/UserIndicator';
@@ -77,6 +77,51 @@ const getAuthorColor = (author: string | null) => {
   return undefined;
 };
 
+const ITEMS_PER_PAGE = 4;
+
+const WatercolorFlowers = () => (
+  <>
+    {/* Top-left cluster */}
+    <div className="fixed top-16 left-4 opacity-20 pointer-events-none select-none text-3xl" style={{ filter: 'blur(0.5px)' }}>
+      🌸
+    </div>
+    <div className="fixed top-28 left-8 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.3px)' }}>
+      🌷
+    </div>
+    <div className="fixed top-10 left-20 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.7px)' }}>
+      🌺
+    </div>
+    {/* Top-right cluster */}
+    <div className="fixed top-20 right-6 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.5px)' }}>
+      🌸
+    </div>
+    <div className="fixed top-8 right-24 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.6px)' }}>
+      🌼
+    </div>
+    {/* Bottom-left */}
+    <div className="fixed bottom-20 left-6 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.4px)' }}>
+      🌷
+    </div>
+    <div className="fixed bottom-8 left-16 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.7px)' }}>
+      🌸
+    </div>
+    {/* Bottom-right */}
+    <div className="fixed bottom-16 right-8 opacity-15 pointer-events-none select-none text-2xl" style={{ filter: 'blur(0.5px)' }}>
+      🌺
+    </div>
+    <div className="fixed bottom-32 right-20 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.6px)' }}>
+      🌸
+    </div>
+    {/* Mid sides */}
+    <div className="fixed top-1/2 left-2 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.5px)' }}>
+      🌼
+    </div>
+    <div className="fixed top-1/2 right-3 opacity-10 pointer-events-none select-none text-xl" style={{ filter: 'blur(0.5px)' }}>
+      🌷
+    </div>
+  </>
+);
+
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,6 +134,12 @@ const Index = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // Reset page when tab or search changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [activeTab, searchQuery]);
 
   useEffect(() => {
     fetchData();
@@ -224,8 +275,10 @@ const Index = () => {
         </div>
       </div>
 
+      <WatercolorFlowers />
+
       {/* Content */}
-      <main className="max-w-5xl mx-auto px-6 py-6">
+      <main className="max-w-5xl mx-auto px-6 py-6 relative z-10">
         {activeTab === 'appreciation' ? (
           <div className="space-y-8">
             {quotes.filter((q) => {
@@ -362,62 +415,88 @@ const Index = () => {
               </div>
             )}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {posts
-              .filter((p) => {
-                if (!searchQuery) return true;
-                const s = searchQuery.toLowerCase();
-                return p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s);
-              })
-              .map((p) => (
-              <Card
-                key={p.id}
-                className="bg-card border-border cursor-pointer hover:shadow-md transition-all rounded-2xl flex flex-col relative py-4 px-4"
-                onClick={() => navigate(`/post/${p.id}`)}
-              >
-                <div className="flex flex-col items-start text-left gap-1">
-                  <CardTitle className="text-sm font-normal leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>
-                    {p.title}
-                  </CardTitle>
-                  <p className="text-[10px] text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
-                    {format(new Date(p.created_at), 'MMMM d, yyyy')}
-                  </p>
-                  <span className="inline-flex items-center gap-1.5 mt-0.5">
-                    <span
-                      className="w-2 h-2 rounded-full inline-block"
-                      style={{ backgroundColor: getAuthorColor(p.author) || 'hsl(var(--muted-foreground))' }}
-                    />
-                    <span className="text-[10px] text-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
-                      {p.author}
-                    </span>
-                  </span>
-                </div>
-                {isOwner(p.user_id) && (
-                  <div className="absolute bottom-2 right-2 flex gap-1">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}
-                      className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
-                      title="delete"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
+        ) : (() => {
+          const filtered = posts.filter((p) => {
+            if (!searchQuery) return true;
+            const s = searchQuery.toLowerCase();
+            return p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s);
+          });
+          const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+          const paged = filtered.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE);
 
-        {/* Empty state */}
-        {activeTab !== 'appreciation' && posts.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground italic text-lg" style={{ fontFamily: 'var(--font-serif)' }}>
-              nothing here yet…
-            </p>
-            <div className="ornament" />
-          </div>
-        )}
+          return filtered.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground italic text-lg" style={{ fontFamily: 'var(--font-serif)' }}>
+                nothing here yet…
+              </p>
+              <div className="ornament" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {paged.map((p) => (
+                  <Card
+                    key={p.id}
+                    className="bg-card border-border cursor-pointer hover:shadow-md transition-all rounded-2xl flex flex-col relative py-4 px-4"
+                    onClick={() => navigate(`/post/${p.id}`)}
+                  >
+                    <div className="flex flex-col items-start text-left gap-1">
+                      <CardTitle className="text-sm font-normal leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>
+                        {p.title}
+                      </CardTitle>
+                      <p className="text-[10px] text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
+                        {format(new Date(p.created_at), 'MMMM d, yyyy')}
+                      </p>
+                      <span className="inline-flex items-center gap-1.5 mt-0.5">
+                        <span
+                          className="w-2 h-2 rounded-full inline-block"
+                          style={{ backgroundColor: getAuthorColor(p.author) || 'hsl(var(--muted-foreground))' }}
+                        />
+                        <span className="text-[10px] text-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
+                          {p.author}
+                        </span>
+                      </span>
+                    </div>
+                    {isOwner(p.user_id) && (
+                      <div className="absolute bottom-2 right-2 flex gap-1">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}
+                          className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
+                          title="delete"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+
+              {/* Pagination arrows */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-6 mt-8">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                    disabled={currentPage === 0}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors p-2"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="text-xs text-muted-foreground" style={{ fontFamily: 'var(--font-mono)' }}>
+                    {currentPage + 1} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={currentPage === totalPages - 1}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors p-2"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </main>
 
       {/* Compose button (logged in only) */}

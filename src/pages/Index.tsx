@@ -53,7 +53,7 @@ const Index = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
-  const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  
 
   useEffect(() => {
     fetchData();

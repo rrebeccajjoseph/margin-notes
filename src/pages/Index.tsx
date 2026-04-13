@@ -415,62 +415,88 @@ const Index = () => {
               </div>
             )}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {posts
-              .filter((p) => {
-                if (!searchQuery) return true;
-                const s = searchQuery.toLowerCase();
-                return p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s);
-              })
-              .map((p) => (
-              <Card
-                key={p.id}
-                className="bg-card border-border cursor-pointer hover:shadow-md transition-all rounded-2xl flex flex-col relative py-4 px-4"
-                onClick={() => navigate(`/post/${p.id}`)}
-              >
-                <div className="flex flex-col items-start text-left gap-1">
-                  <CardTitle className="text-sm font-normal leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>
-                    {p.title}
-                  </CardTitle>
-                  <p className="text-[10px] text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
-                    {format(new Date(p.created_at), 'MMMM d, yyyy')}
-                  </p>
-                  <span className="inline-flex items-center gap-1.5 mt-0.5">
-                    <span
-                      className="w-2 h-2 rounded-full inline-block"
-                      style={{ backgroundColor: getAuthorColor(p.author) || 'hsl(var(--muted-foreground))' }}
-                    />
-                    <span className="text-[10px] text-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
-                      {p.author}
-                    </span>
-                  </span>
-                </div>
-                {isOwner(p.user_id) && (
-                  <div className="absolute bottom-2 right-2 flex gap-1">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}
-                      className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
-                      title="delete"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
+        ) : (() => {
+          const filtered = posts.filter((p) => {
+            if (!searchQuery) return true;
+            const s = searchQuery.toLowerCase();
+            return p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s);
+          });
+          const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+          const paged = filtered.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE);
 
-        {/* Empty state */}
-        {activeTab !== 'appreciation' && posts.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground italic text-lg" style={{ fontFamily: 'var(--font-serif)' }}>
-              nothing here yet…
-            </p>
-            <div className="ornament" />
-          </div>
-        )}
+          return filtered.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground italic text-lg" style={{ fontFamily: 'var(--font-serif)' }}>
+                nothing here yet…
+              </p>
+              <div className="ornament" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {paged.map((p) => (
+                  <Card
+                    key={p.id}
+                    className="bg-card border-border cursor-pointer hover:shadow-md transition-all rounded-2xl flex flex-col relative py-4 px-4"
+                    onClick={() => navigate(`/post/${p.id}`)}
+                  >
+                    <div className="flex flex-col items-start text-left gap-1">
+                      <CardTitle className="text-sm font-normal leading-snug" style={{ fontFamily: 'var(--font-serif)' }}>
+                        {p.title}
+                      </CardTitle>
+                      <p className="text-[10px] text-muted-foreground" style={{ fontFamily: 'var(--font-body)' }}>
+                        {format(new Date(p.created_at), 'MMMM d, yyyy')}
+                      </p>
+                      <span className="inline-flex items-center gap-1.5 mt-0.5">
+                        <span
+                          className="w-2 h-2 rounded-full inline-block"
+                          style={{ backgroundColor: getAuthorColor(p.author) || 'hsl(var(--muted-foreground))' }}
+                        />
+                        <span className="text-[10px] text-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
+                          {p.author}
+                        </span>
+                      </span>
+                    </div>
+                    {isOwner(p.user_id) && (
+                      <div className="absolute bottom-2 right-2 flex gap-1">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}
+                          className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
+                          title="delete"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+
+              {/* Pagination arrows */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-6 mt-8">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                    disabled={currentPage === 0}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors p-2"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="text-xs text-muted-foreground" style={{ fontFamily: 'var(--font-mono)' }}>
+                    {currentPage + 1} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={currentPage === totalPages - 1}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors p-2"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </main>
 
       {/* Compose button (logged in only) */}

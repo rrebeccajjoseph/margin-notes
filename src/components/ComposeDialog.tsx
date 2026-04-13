@@ -17,12 +17,18 @@ interface ComposeDialogProps {
   defaultType?: ContentType;
 }
 
-const getAuthorName = (email: string | null) => {
-  if (!email) return 'anonymous';
+const authorOptions = [
+  { value: 'rebecca joseph', label: 'rebecca joseph' },
+  { value: 'isha jain', label: 'isha jain' },
+  { value: 'rebecca and isha', label: 'rebecca and isha' },
+];
+
+const getDefaultAuthor = (email: string | null) => {
+  if (!email) return 'rebecca and isha';
   const lower = email.toLowerCase();
-  if (lower.includes('isha')) return 'isha';
-  if (lower.includes('rebecca') || lower.includes('rjoseph')) return 'rebecca';
-  return email.split('@')[0];
+  if (lower.includes('isha')) return 'isha jain';
+  if (lower.includes('rebecca') || lower.includes('rjoseph')) return 'rebecca joseph';
+  return 'rebecca and isha';
 };
 
 const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
@@ -36,6 +42,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
   const [content, setContent] = useState('');
   const [text, setText] = useState('');
   const [author, setAuthor] = useState('');
+  const [selectedAuthor, setSelectedAuthor] = useState(() => getDefaultAuthor(user?.email ?? null));
   const [source, setSource] = useState('');
   const [description, setDescription] = useState('');
   const [link, setLink] = useState('');
@@ -48,6 +55,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
     setContent('');
     setText('');
     setAuthor('');
+    setSelectedAuthor(getDefaultAuthor(user?.email ?? null));
     setSource('');
     setDescription('');
     setLink('');
@@ -57,14 +65,14 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const authorName = getAuthorName(user.email ?? null);
+      
 
       if (contentType === 'essay' || contentType === 'poetry') {
         const { error } = await supabase.from('posts').insert({
           title,
           content,
           category: contentType,
-          author: authorName,
+          author: selectedAuthor,
           user_id: user.id,
           published: true,
         });
@@ -82,7 +90,7 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
       } else if (contentType === 'book') {
         const { error } = await supabase.from('books').insert({
           title,
-          author: author || authorName,
+          author: author || selectedAuthor,
           rating: rating || null,
           link: link || null,
           user_id: user.id,
@@ -151,6 +159,16 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
                 className="border-border bg-transparent"
                 style={{ fontFamily: 'var(--font-serif)' }}
               />
+              <Select value={selectedAuthor} onValueChange={setSelectedAuthor}>
+                <SelectTrigger className="border-border" style={{ fontFamily: 'var(--font-body)' }}>
+                  <SelectValue placeholder="author" />
+                </SelectTrigger>
+                <SelectContent>
+                  {authorOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <RichTextEditor
                 content={content}
                 onChange={setContent}

@@ -275,8 +275,10 @@ const Index = () => {
         </div>
       </div>
 
+      <WatercolorFlowers />
+
       {/* Content */}
-      <main className="max-w-5xl mx-auto px-6 py-6">
+      <main className="max-w-5xl mx-auto px-6 py-6 relative z-10">
         {activeTab === 'appreciation' ? (
           <div className="space-y-8">
             {quotes.filter((q) => {

@@ -83,9 +83,11 @@ const PostDetail = () => {
           <span>·</span>
           <span className="italic">{post.author}</span>
         </div>
-        <div className="prose-vintage text-base leading-[2] whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
-          {post.content}
-        </div>
+        <div
+          className="prose prose-sm max-w-none leading-[2]"
+          style={{ fontFamily: 'var(--font-body)' }}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
       </main>
 
       {/* Footer */}

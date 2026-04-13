@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Search, ArrowUpRight, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -95,6 +96,30 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleEggClick = () => {
+    if (user) {
+      signOut().then(() => navigate('/'));
+    } else {
+      setShowLogin(true);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      toast.error(error.message);
+    } else {
+      setShowLogin(false);
+      setEmail('');
+      setPassword('');
+      toast.success('welcome back ✿');
+    }
+  };
 
   // Reset page when tab or search changes
   useEffect(() => {
@@ -175,8 +200,8 @@ const Index = () => {
           <img
             src={eggImg}
             alt="egg"
-            className="w-8 h-8 cursor-pointer opacity-40 hover:opacity-80 hover:animate-wiggle transition-opacity"
-            onClick={() => user ? signOut().then(() => navigate('/')) : navigate('/auth')}
+            className="w-10 md:w-14 cursor-pointer opacity-40 hover:opacity-100 hover:scale-110 transition-all"
+            onClick={handleEggClick}
             title={user ? 'sign out' : 'sign in'}
             width={512}
             height={512}
@@ -479,6 +504,56 @@ const Index = () => {
           ❦ made with tenderness ❦
         </p>
       </footer>
+
+      {/* Login popup */}
+      {showLogin && (
+        <div
+          className="fixed inset-0 bg-foreground/20 flex items-center justify-center z-50 px-6"
+          onClick={(e) => { e.stopPropagation(); setShowLogin(false); }}
+        >
+          <div
+            className="bg-card border border-border rounded-lg p-8 w-full max-w-sm animate-fade-in shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-light text-center mb-1" style={{ fontFamily: 'var(--font-mono)' }}>
+              log in
+            </h2>
+            <p className="text-xs text-muted-foreground text-center italic mb-6" style={{ fontFamily: 'var(--font-body)' }}>
+              if you can guess our password feel free to publish your work :)
+            </p>
+            <form onSubmit={handleLogin} className="space-y-3">
+              <Input
+                type="email"
+                placeholder="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-background border-border text-sm"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              />
+              <Input
+                type="password"
+                placeholder="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="bg-background border-border text-sm"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              />
+              <Button type="submit" className="w-full text-sm" style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
+                enter
+              </Button>
+            </form>
+            <button
+              onClick={() => setShowLogin(false)}
+              className="w-full text-center mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              never mind
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

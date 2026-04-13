@@ -36,7 +36,7 @@ const Splash = () => {
         <img
           src={chickenImg}
           alt="A cute hand-drawn chicken"
-          className="w-24 md:w-32 absolute bottom-4 left-1/2 -translate-x-1/2"
+          className="w-24 md:w-32 absolute bottom-4 left-1/2 -translate-x-1/2 hover:animate-wiggle transition-transform"
           width={512}
           height={512}
         />

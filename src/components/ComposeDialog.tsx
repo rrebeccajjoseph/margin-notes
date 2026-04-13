@@ -159,6 +159,16 @@ const ComposeDialog = ({ onCreated, defaultType }: ComposeDialogProps) => {
                 className="border-border bg-transparent"
                 style={{ fontFamily: 'var(--font-serif)' }}
               />
+              <Select value={selectedAuthor} onValueChange={setSelectedAuthor}>
+                <SelectTrigger className="border-border" style={{ fontFamily: 'var(--font-body)' }}>
+                  <SelectValue placeholder="author" />
+                </SelectTrigger>
+                <SelectContent>
+                  {authorOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <RichTextEditor
                 content={content}
                 onChange={setContent}

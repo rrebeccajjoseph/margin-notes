@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Search, ArrowUpRight, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import UserIndicator from '@/components/UserIndicator';
+
 import ComposeDialog from '@/components/ComposeDialog';
 import chickenImg from '@/assets/chicken.png';
+import eggImg from '@/assets/egg.png';
 
 type Category = 'essay' | 'poetry';
 type Tab = Category | 'appreciation';
@@ -84,7 +85,7 @@ const ITEMS_PER_PAGE = 4;
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const initialTab = (location.state as any)?.tab || 'essay';
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -171,7 +172,15 @@ const Index = () => {
               ← back to chicken
             </button>
           </div>
-          <UserIndicator />
+          <img
+            src={eggImg}
+            alt="egg"
+            className="w-8 h-8 cursor-pointer opacity-40 hover:opacity-80 hover:animate-wiggle transition-opacity"
+            onClick={() => user ? signOut().then(() => navigate('/')) : navigate('/auth')}
+            title={user ? 'sign out' : 'sign in'}
+            width={512}
+            height={512}
+          />
         </div>
       </header>
 

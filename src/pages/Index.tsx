@@ -99,7 +99,7 @@ const Index = () => {
           {(Object.keys(tabLabels) as Tab[]).map((tab) => (
             <button
               key={tab}
-              onClick={() => { setActiveTab(tab); setExpandedPost(null); }}
+              onClick={() => setActiveTab(tab)}
               className={`px-5 py-3 text-sm tracking-wider border-b-2 transition-colors ${
                 activeTab === tab
                   ? 'border-foreground text-foreground'

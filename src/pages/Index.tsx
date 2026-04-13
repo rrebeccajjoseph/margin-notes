@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Search, ArrowUpRight, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import UserIndicator from '@/components/UserIndicator';
+
 import ComposeDialog from '@/components/ComposeDialog';
 import chickenImg from '@/assets/chicken.png';
 import eggImg from '@/assets/egg.png';

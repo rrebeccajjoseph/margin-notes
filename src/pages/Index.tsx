@@ -118,6 +118,13 @@ const Index = () => {
             </button>
           ))}
         </div>
+        {tabDescriptions[activeTab] && (
+          <div className="max-w-5xl mx-auto px-5 pt-2 pb-1">
+            <p className="text-xs text-muted-foreground italic" style={{ fontFamily: 'var(--font-body)' }}>
+              {tabDescriptions[activeTab]}
+            </p>
+          </div>
+        )}
       </nav>
 
       {/* Search */}

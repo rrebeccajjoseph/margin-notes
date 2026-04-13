@@ -160,7 +160,7 @@ const Index = () => {
   };
 
   const OwnerActions = ({ table, id, userId }: { table: string; id: string; userId: string }) => {
-    if (!isOwner(userId)) return null;
+    if (!user) return null;
     return (
       <div className="flex gap-1.5 mt-2">
         <button
@@ -444,7 +444,7 @@ const Index = () => {
                         </span>
                       </span>
                     </div>
-                    {isOwner(p.user_id) && (
+                    {user && (
                       <div className="absolute bottom-2 right-2 flex gap-1">
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDelete('posts', p.id); }}

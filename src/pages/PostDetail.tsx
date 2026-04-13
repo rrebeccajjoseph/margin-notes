@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Post {
@@ -35,6 +37,7 @@ const categoryLabels: Record<string, string> = {
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -65,6 +68,17 @@ const PostDetail = () => {
     };
     fetchComments();
   }, [id]);
+
+  const handleDeletePost = async () => {
+    if (!post || !confirm('delete this post?')) return;
+    const { error } = await supabase.from('posts').delete().eq('id', post.id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('deleted');
+      navigate('/home', { state: { tab: post.category } });
+    }
+  };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +133,15 @@ const PostDetail = () => {
             <span className="mx-2">/</span>
             <span className="text-foreground">{post.title.toLowerCase()}</span>
           </nav>
+          {user && (
+            <button
+              onClick={handleDeletePost}
+              className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
+              title="delete post"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
         </div>
       </header>
 

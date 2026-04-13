@@ -136,6 +136,11 @@ const Index = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 
+  // Reset page when tab or search changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [activeTab, searchQuery]);
+
   useEffect(() => {
     fetchData();
   }, [activeTab]);
